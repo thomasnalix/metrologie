@@ -1,0 +1,56 @@
+groups:
+  - name: node_exporter_alerts
+    rules:
+      - alert: NodeExporterUp
+        expr: up{job="node"} == 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node Exporter UP (instance={{ $labels.instance }})"
+          description: "Le service node_exporter (instance {{ $labels.instance }}) ne répond depuis plus de 1 min."
+      
+      - alert: AppErrorRate
+        expr: |
+          (
+            sum by(instance) (rate(http_requests_total{status=~"5.."}[5m]))
+            /
+            sum by(instance) (rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Taux d'erreur HTTP élevé (>5%)"
+          description: "Plus de 5% des requêtes HTTP renvoient des erreurs 5xx depuis 5 minutes."
+      
+      - alert: AppTooFewRequests
+        expr: |
+          sum by(instance) (increase(http_requests_total[5m])) < 10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Peu de trafic HTTP"
+          description: "L'application reçoit moins de 1 requête HTTP/s (moins de 10 en 10 min)."
+      
+      - alert: NodeExporterDown
+        expr: up{job="node"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: dev
+        annotations:
+          summary: "Node Exporter est down"
+          description: "Le job node_exporter ne répond plus depuis plus de 1 minute."
+          
+      - alert: NodeExporterDown
+        expr: up{job="node"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: infra
+        annotations:
+          summary: "Node Exporter est down"
+          description: "Le job node_exporter ne répond plus depuis plus de 1 minute."
+
