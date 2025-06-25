@@ -1,0 +1,36 @@
+1	Recherche KQL / Lucene
+Retrouver les pics de pollution	1. Discover → data-view logstash-*.
+2. Barre KQL :
+    - Faire une recherche un Nom && data value > 10 && sur une période entre 2008 et 2014
+    - N'afficher que ces champs là dans la recherche du résultat + trier par data_value décroissante
+
+########## Pensez à enregistrer vos visualisations dans un dashboard, utilise pour la partie 5 #######
+
+3	Lens time-series	
+    1. Visualize → Create → Lens.
+    2. X-axis : @timestamp.
+    3. Y-axis : Average data_value.
+    4. Break down by name (Ozone vs SO2).
+    5. Type : Area chart.	Courbe multi-série, inspection des requêtes générées.
+
+    
+4    TSVB
+    - Visualize → Create → Lens.
+    - Group by : time_period.keyword (Y).
+    - Group by : name.keyword (X).
+    - Metric : Avg data_value.
+    - Faire un screen d'une recherche sur une date puis faire un screen d'une recherche sur un name, le tout dans l'onglet "Metric"
+
+
+5	Dashboard interactif	
+
+
+    *Si vous avez rajouté vos visu dans le dashboard --> 
+         Ajoute un contrôle Options list sur geo_place.keyword.
+         Filtrer le tableau de bord sur “Bronx” et voir toutes les visu réagir.
+
+    *Si vous n'avez pas pensé à rajouter vos visu vous avez donc coché "None" à la sauvegardes.*
+    - Analytics --> Dashboard --> Create dashboard --> Add from library
+    - Rajoutez vos Visu
+    - Ajoutez un contrôle Options list sur geo_place.keyword.
+    - Filtrer le tableau de bord sur “Bronx” et voir toutes les visu réagir.

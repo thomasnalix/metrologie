@@ -1,0 +1,52 @@
+# ======================= Inputs =========================
+filebeat.inputs:
+  - type: filestream
+    id: air-quality
+    paths:
+      - /usr/share/filebeat/ingest_data/app/Air_Quality.log   # chemin dans le conteneur
+    processors:
+      - decode_csv_fields:
+          fields: {message: csv}
+          separator: ","
+          target: ""
+          overwrite_keys: true
+      - rename:
+          fields:
+            - {from: "Measure Info", to: "measure_info"}
+      - convert:
+          fields:
+            - {from: "Data Value", to: "data_value", type: float}
+      - date:
+          field: Start_Date
+          target_field: "@timestamp"
+          formats: ["MM/dd/yyyy"]
+          timezone: America/New_York
+
+# =================== Docker autodiscovery ===============
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      # Labels "co.elastic.logs/parse: json" déclenchent la config suivante :
+      hints.default_config:
+        type: container
+        paths:                # chemins internes de logs Docker
+          - /var/lib/docker/containers/*/*.log
+        processors:
+          - decode_json_fields:
+              fields: ["message"]
+              target: ""          # place les clés au niveau racine
+              overwrite_keys: true
+
+# ==================== Kibana & ES =======================
+setup.kibana:
+  host: ${KIBANA_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD}
+
+output.elasticsearch:
+  hosts: ${ELASTIC_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD}
+  ssl.enabled: true
+  ssl.certificate_authorities: "certs/ca/ca.crt"
